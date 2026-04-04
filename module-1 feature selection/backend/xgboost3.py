@@ -1072,6 +1072,25 @@ def run_pipeline(csv_file):
         "predictions": [int(p) for p in y_pred.tolist()],
         "class_names": list(target_le.classes_) if target_le is not None else None,
         "preprocessing_summary": validation_summary,
+        
     }
+# ── Export 8-feature CSV directly to module2_quantum/ ────────────────────
+    import os, sys
+    module2_path = os.path.normpath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     "..", "..", "module2_quantum")
+    )
+    if os.path.exists(module2_path):
+        import pandas as pd
+        df_export  = pd.read_csv(csv_file)
+        feat_names = [f["feature"] for f in results["top_features"]]
+        target     = df_export.columns[-1]
+        cols       = [c for c in feat_names if c in df_export.columns]
+        if cols:
+            out = os.path.join(module2_path, "diabetes_8features.csv")
+            df_export[cols + [target]].to_csv(out, index=False)
+            results["quantum_csv_saved"] = out
+            print(f"  Exported to Module 2: {out}")
 
+    return results
     return results

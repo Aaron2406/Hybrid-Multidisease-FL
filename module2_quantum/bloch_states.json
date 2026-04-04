@@ -1,0 +1,50 @@
+[
+  {
+    "qubit": 0,
+    "feature": "HighBP",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  },
+  {
+    "qubit": 1,
+    "feature": "GenHlth",
+    "z": -0.7071,
+    "label": "mostly |1> (moderate signal)"
+  },
+  {
+    "qubit": 2,
+    "feature": "HighChol",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  },
+  {
+    "qubit": 3,
+    "feature": "BMI",
+    "z": -0.9927,
+    "label": "|1> (strong disease signal)"
+  },
+  {
+    "qubit": 4,
+    "feature": "DifficultyWalk",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  },
+  {
+    "qubit": 5,
+    "feature": "Age",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  },
+  {
+    "qubit": 6,
+    "feature": "PhysHlth",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  },
+  {
+    "qubit": 7,
+    "feature": "HeartDiseaseorAttack",
+    "z": 0.0,
+    "label": "superposition (uncertain)"
+  }
+]

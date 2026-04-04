@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────────
+#  Module 2 — Quantum Feature Encoding
+#  Install with: pip install -r requirements_module2.txt
+# ─────────────────────────────────────────────
+
+# Core quantum computing framework
+pennylane==0.38.0
+
+# Fast quantum simulator (CPU backend for PennyLane)
+pennylane-lightning==0.38.0
+
+# Numerical operations (quantum state vectors, matrix ops)
+numpy==1.26.4
+
+# Data handling (load diabetes_8features.csv)
+pandas==2.2.2
+
+# Preprocessing (MinMaxScaler for normalization to [0, π])
+scikit-learn==1.4.2
+
+# Class imbalance handling (SMOTE)
+imbalanced-learn==0.12.3
+
+# Visualization (circuit diagrams, feature plots)
+matplotlib==3.9.0

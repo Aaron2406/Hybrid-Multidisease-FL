@@ -205,3 +205,42 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+echo venv/ > .gitignore
+echo __pycache__/ >> .gitignore
+echo *.pyc >> .gitignore
+echo node_modules/ >> .gitignore
+echo .env >> .gitignore
+echo *.npy >> .gitignore
+echo diabetes_data.csv >> .gitignore
+```
+
+Or create `.gitignore` manually in VS Code with this content:
+```
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Large data files
+diabetes_data.csv
+*.npy
+
+# OS
+.DS_Store
+Thumbs.db
+# Generated quantum outputs
+backend/quantum_train_features.csv
+backend/quantum_test_features.csv
+backend/quantum_weights.npy
+backend/bloch_states.json
+backend/simulation_report.txt
+
+
