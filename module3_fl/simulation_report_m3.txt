@@ -1,0 +1,65 @@
+=================================================================
+  FEDERATED LEARNING SIMULATION REPORT  (Module 3C)
+  Algorithm: FedProx
+=================================================================
+
+  Clients   : 3 (simulated hospitals)
+  Rounds    : 5
+  mu        : 0.01
+  Local model: Logistic Regression (multinomial)
+
+  WHY FEDPROX:
+  FedAvg simply averages client weights, which fails when hospital data distributions differ (non-IID). FedProx adds a proximal term (mu/2)||w-w_global||^2 to each client's local objective. This mathematically constrains how far the local model can drift from the global model during each round, ensuring stable convergence even with heterogeneous hospital data.
+
+  CLIENT PROFILES (non-IID data distribution)
+  --------------------------------------------------
+  Hospital 1      19286 samples  class dist={'0': 18851, '1': 134, '2': 79, '3': 222}
+  Hospital 2      19285 samples  class dist={'0': 18851, '1': 133, '2': 79, '3': 222}
+  Hospital 3      19285 samples  class dist={'0': 18851, '1': 133, '2': 79, '3': 222}
+
+  ROUND BY ROUND TRACE
+  --------------------------------------------------
+
+  Round 1:
+  Round 1: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.
+  Global acc=0.9838  f1=0.976
+    Client 0: acc=0.9838  f1=0.976
+    Client 1: acc=0.984  f1=0.9762
+    Client 2: acc=0.9841  f1=0.9763
+
+  Round 2:
+  Round 2: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.
+  Global acc=0.9838  f1=0.976
+    Client 0: acc=0.9838  f1=0.976
+    Client 1: acc=0.984  f1=0.9762
+    Client 2: acc=0.9841  f1=0.9763
+
+  Round 3:
+  Round 3: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.
+  Global acc=0.9838  f1=0.976
+    Client 0: acc=0.9838  f1=0.976
+    Client 1: acc=0.984  f1=0.9762
+    Client 2: acc=0.9841  f1=0.9763
+
+  Round 4:
+  Round 4: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.
+  Global acc=0.9838  f1=0.976
+    Client 0: acc=0.9838  f1=0.976
+    Client 1: acc=0.984  f1=0.9762
+    Client 2: acc=0.9841  f1=0.9763
+
+  Round 5:
+  Round 5: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.
+  Global acc=0.9838  f1=0.976
+    Client 0: acc=0.9838  f1=0.976
+    Client 1: acc=0.984  f1=0.9762
+    Client 2: acc=0.9841  f1=0.9763
+
+  CONVERGENCE
+  --------------------------------------------------
+  Status: converged (delta=0.0000)
+  Global accuracy per round: [0.9838, 0.9838, 0.9838, 0.9838, 0.9838]
+
+=================================================================
+  END OF REPORT
+=================================================================

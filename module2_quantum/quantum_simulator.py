@@ -361,6 +361,17 @@ def run_simulation(csv_path, weights):
 
     # Get raw values from CSV using the NOW-populated FEATURES list
     df           = pd.read_csv(csv_path)
+    # ── Encode text values before extracting raw features ──
+    for col in df.columns:
+        if df[col].dtype == object:
+            df[col] = df[col].astype(str).str.strip().str.lower()
+            df[col] = df[col].replace({
+                'yes': 1, 'no': 0,
+                'true': 1, 'false': 0,
+                'male': 1, 'female': 0,
+                'positive': 1, 'negative': 0,
+            })
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     features_raw = df[FEATURES].iloc[0].values
 
     print(f"  Features         : {FEATURES}")

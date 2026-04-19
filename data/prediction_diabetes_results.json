@@ -1,0 +1,120 @@
+{
+  "disease": "diabetes",
+  "test_metrics": {
+    "accuracy": 0.6748,
+    "f1": 0.6742,
+    "precision": 0.6761,
+    "recall": 0.6748,
+    "auc": 0.7093,
+    "confusion_matrix": [
+      [
+        4471,
+        2599
+      ],
+      [
+        1999,
+        5070
+      ]
+    ],
+    "test_samples": 14139,
+    "feature_cols": [
+      "Q_feature_0",
+      "Q_feature_1",
+      "Q_feature_2",
+      "Q_feature_3",
+      "Q_feature_4",
+      "Q_feature_5",
+      "Q_feature_6",
+      "Q_feature_7"
+    ]
+  },
+  "shap_values": [
+    {
+      "feature": "Q_feature_1",
+      "mean_abs": 0.6339,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 1
+    },
+    {
+      "feature": "Q_feature_2",
+      "mean_abs": 0.1283,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 2
+    },
+    {
+      "feature": "Q_feature_7",
+      "mean_abs": 0.1018,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 3
+    },
+    {
+      "feature": "Q_feature_4",
+      "mean_abs": 0.0758,
+      "mean_signed": 0.0,
+      "direction": "increases risk",
+      "rank": 4
+    },
+    {
+      "feature": "Q_feature_3",
+      "mean_abs": 0.0427,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 5
+    },
+    {
+      "feature": "Q_feature_5",
+      "mean_abs": 0.0231,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 6
+    },
+    {
+      "feature": "Q_feature_0",
+      "mean_abs": 0.0212,
+      "mean_signed": -0.0,
+      "direction": "decreases risk",
+      "rank": 7
+    },
+    {
+      "feature": "Q_feature_6",
+      "mean_abs": 0.0199,
+      "mean_signed": 0.0,
+      "direction": "increases risk",
+      "rank": 8
+    }
+  ],
+  "sample_prediction": {
+    "prediction": 1,
+    "label": "Diabetic",
+    "probability": 0.5186,
+    "risk_level": "Medium",
+    "q_features": [
+      -0.3503,
+      -0.0841,
+      -0.0894,
+      0.2257,
+      0.0634,
+      0.1221,
+      -0.1172,
+      0.0308
+    ]
+  },
+  "model_info": {
+    "algorithm": "FedProx",
+    "local_model": "Logistic Regression",
+    "n_features": 8,
+    "feature_cols": [
+      "Q_feature_0",
+      "Q_feature_1",
+      "Q_feature_2",
+      "Q_feature_3",
+      "Q_feature_4",
+      "Q_feature_5",
+      "Q_feature_6",
+      "Q_feature_7"
+    ]
+  }
+}

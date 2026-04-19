@@ -1,0 +1,186 @@
+{
+  "mode": "unified",
+  "diseases_used": [
+    "diabetes",
+    "kidney",
+    "heart",
+    "liver"
+  ],
+  "test_metrics": {
+    "accuracy": 0.9872,
+    "f1": 0.9811,
+    "precision": 0.9751,
+    "recall": 0.9872,
+    "confusion_matrix": [
+      [
+        14139,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        73,
+        0,
+        0
+      ],
+      [
+        60,
+        0,
+        0,
+        0
+      ],
+      [
+        114,
+        3,
+        0,
+        0
+      ]
+    ],
+    "test_samples": 14396,
+    "feature_cols": [
+      "Q_feature_0",
+      "Q_feature_1",
+      "Q_feature_2",
+      "Q_feature_3",
+      "Q_feature_4",
+      "Q_feature_5",
+      "Q_feature_6",
+      "Q_feature_7"
+    ],
+    "class_names": {
+      "0": "diabetes",
+      "1": "kidney",
+      "2": "heart",
+      "3": "liver"
+    }
+  },
+  "shap_values": [
+    {
+      "feature": "Q_feature_0",
+      "mean_abs": 1.0105,
+      "mean_signed": 1.0105,
+      "direction": "increases risk",
+      "rank": 1
+    },
+    {
+      "feature": "Q_feature_1",
+      "mean_abs": 0.8683,
+      "mean_signed": 0.8683,
+      "direction": "increases risk",
+      "rank": 2
+    },
+    {
+      "feature": "Q_feature_2",
+      "mean_abs": 0.7193,
+      "mean_signed": 0.7193,
+      "direction": "increases risk",
+      "rank": 3
+    },
+    {
+      "feature": "Q_feature_5",
+      "mean_abs": 0.4804,
+      "mean_signed": 0.4804,
+      "direction": "increases risk",
+      "rank": 4
+    },
+    {
+      "feature": "Q_feature_3",
+      "mean_abs": 0.474,
+      "mean_signed": 0.474,
+      "direction": "increases risk",
+      "rank": 5
+    },
+    {
+      "feature": "Q_feature_6",
+      "mean_abs": 0.3871,
+      "mean_signed": 0.3871,
+      "direction": "increases risk",
+      "rank": 6
+    },
+    {
+      "feature": "Q_feature_4",
+      "mean_abs": 0.3742,
+      "mean_signed": 0.3742,
+      "direction": "increases risk",
+      "rank": 7
+    },
+    {
+      "feature": "Q_feature_7",
+      "mean_abs": 0.1563,
+      "mean_signed": 0.1563,
+      "direction": "increases risk",
+      "rank": 8
+    }
+  ],
+  "sample_prediction": {
+    "primary_disease": "heart",
+    "primary_icon": "\u2764\ufe0f",
+    "primary_label": "Heart Disease",
+    "overall_risk": "High",
+    "disease_predictions": [
+      {
+        "disease": "heart",
+        "icon": "\u2764\ufe0f",
+        "label": "Heart Disease",
+        "neg_label": "No Heart Disease",
+        "probability": 100.0,
+        "detected": true,
+        "risk_level": "High"
+      },
+      {
+        "disease": "diabetes",
+        "icon": "\ud83e\ude7a",
+        "label": "Diabetic",
+        "neg_label": "No Diabetes",
+        "probability": 0.0,
+        "detected": false,
+        "risk_level": "Low"
+      },
+      {
+        "disease": "kidney",
+        "icon": "\ud83e\uded8",
+        "label": "CKD Detected",
+        "neg_label": "No Kidney Disease",
+        "probability": 0.0,
+        "detected": false,
+        "risk_level": "Low"
+      },
+      {
+        "disease": "liver",
+        "icon": "\ud83e\udec0",
+        "label": "Liver Disease",
+        "neg_label": "No Liver Disease",
+        "probability": 0.0,
+        "detected": false,
+        "risk_level": "Low"
+      }
+    ],
+    "q_features": [
+      -0.8004,
+      -0.3189,
+      -0.2864,
+      1.2405,
+      1.5467,
+      1.3375,
+      -0.7386,
+      0.9121
+    ]
+  },
+  "model_info": {
+    "algorithm": "FedProx Unified",
+    "local_model": "Logistic Regression (multinomial)",
+    "n_features": 8,
+    "n_classes": 4,
+    "feature_cols": [
+      "Q_feature_0",
+      "Q_feature_1",
+      "Q_feature_2",
+      "Q_feature_3",
+      "Q_feature_4",
+      "Q_feature_5",
+      "Q_feature_6",
+      "Q_feature_7"
+    ]
+  }
+}

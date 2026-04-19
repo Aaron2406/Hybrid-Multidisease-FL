@@ -1,0 +1,418 @@
+{
+  "config": {
+    "n_clients": 3,
+    "n_rounds": 5,
+    "mu": 0.01,
+    "algorithm": "FedProx",
+    "local_model": "Logistic Regression (multinomial)",
+    "n_classes": 4,
+    "class_names": {
+      "0": "diabetes",
+      "1": "kidney",
+      "2": "heart",
+      "3": "liver"
+    }
+  },
+  "client_profiles": [
+    {
+      "client_id": 0,
+      "name": "Hospital 1",
+      "n_samples": 19286,
+      "class_dist": {
+        "0": 18851,
+        "1": 134,
+        "2": 79,
+        "3": 222
+      }
+    },
+    {
+      "client_id": 1,
+      "name": "Hospital 2",
+      "n_samples": 19285,
+      "class_dist": {
+        "0": 18851,
+        "1": 133,
+        "2": 79,
+        "3": 222
+      }
+    },
+    {
+      "client_id": 2,
+      "name": "Hospital 3",
+      "n_samples": 19285,
+      "class_dist": {
+        "0": 18851,
+        "1": 133,
+        "2": 79,
+        "3": 222
+      }
+    }
+  ],
+  "round_steps": [
+    {
+      "round": 1,
+      "description": "Round 1: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.",
+      "global_acc": 0.9838,
+      "global_f1": 0.976,
+      "weight_norm": 4.0863,
+      "client_metrics": [
+        {
+          "accuracy": 0.9838,
+          "f1": 0.976,
+          "n_samples": 19286,
+          "class_dist": {
+            "0": 18851,
+            "1": 134,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.984,
+          "f1": 0.9762,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.9841,
+          "f1": 0.9763,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 2
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "description": "Round 2: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.",
+      "global_acc": 0.9838,
+      "global_f1": 0.976,
+      "weight_norm": 4.1271,
+      "client_metrics": [
+        {
+          "accuracy": 0.9838,
+          "f1": 0.976,
+          "n_samples": 19286,
+          "class_dist": {
+            "0": 18851,
+            "1": 134,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.984,
+          "f1": 0.9762,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.9841,
+          "f1": 0.9763,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 2
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "description": "Round 3: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.",
+      "global_acc": 0.9838,
+      "global_f1": 0.976,
+      "weight_norm": 4.1275,
+      "client_metrics": [
+        {
+          "accuracy": 0.9838,
+          "f1": 0.976,
+          "n_samples": 19286,
+          "class_dist": {
+            "0": 18851,
+            "1": 134,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.984,
+          "f1": 0.9762,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.9841,
+          "f1": 0.9763,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 2
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "description": "Round 4: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.",
+      "global_acc": 0.9838,
+      "global_f1": 0.976,
+      "weight_norm": 4.1275,
+      "client_metrics": [
+        {
+          "accuracy": 0.9838,
+          "f1": 0.976,
+          "n_samples": 19286,
+          "class_dist": {
+            "0": 18851,
+            "1": 134,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.984,
+          "f1": 0.9762,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.9841,
+          "f1": 0.9763,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 2
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "description": "Round 5: Each of the 3 hospital clients trained a local Logistic Regression model on their private data using the FedProx objective (proximal term mu=0.01 prevents drift). Hospital 3 achieved the highest local accuracy (0.9841). Hospital 1 had the most heterogeneous data distribution, scoring 0.9838. After FedProx aggregation (weighted average of proximal-updated weights), the global model achieved accuracy=0.9838.",
+      "global_acc": 0.9838,
+      "global_f1": 0.976,
+      "weight_norm": 4.1275,
+      "client_metrics": [
+        {
+          "accuracy": 0.9838,
+          "f1": 0.976,
+          "n_samples": 19286,
+          "class_dist": {
+            "0": 18851,
+            "1": 134,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.984,
+          "f1": 0.9762,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.9841,
+          "f1": 0.9763,
+          "n_samples": 19285,
+          "class_dist": {
+            "0": 18851,
+            "1": 133,
+            "2": 79,
+            "3": 222
+          },
+          "client_id": 2
+        }
+      ]
+    }
+  ],
+  "convergence": {
+    "rounds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "global_acc": [
+      0.9838,
+      0.9838,
+      0.9838,
+      0.9838,
+      0.9838
+    ],
+    "global_f1": [
+      0.976,
+      0.976,
+      0.976,
+      0.976,
+      0.976
+    ],
+    "weight_norms": [
+      4.0863,
+      4.1271,
+      4.1275,
+      4.1275,
+      4.1275
+    ],
+    "weight_drift": [
+      0.0,
+      0.0408,
+      0.0004,
+      0.0,
+      0.0
+    ],
+    "status": "converged (delta=0.0000)"
+  },
+  "client_progression": [
+    {
+      "client_id": 0,
+      "name": "Hospital 1",
+      "profile": {
+        "client_id": 0,
+        "name": "Hospital 1",
+        "n_samples": 19286,
+        "class_dist": {
+          "0": 18851,
+          "1": 134,
+          "2": 79,
+          "3": 222
+        }
+      },
+      "acc_history": [
+        0.9838,
+        0.9838,
+        0.9838,
+        0.9838,
+        0.9838
+      ],
+      "f1_history": [
+        0.976,
+        0.976,
+        0.976,
+        0.976,
+        0.976
+      ],
+      "final_acc": 0.9838
+    },
+    {
+      "client_id": 1,
+      "name": "Hospital 2",
+      "profile": {
+        "client_id": 1,
+        "name": "Hospital 2",
+        "n_samples": 19285,
+        "class_dist": {
+          "0": 18851,
+          "1": 133,
+          "2": 79,
+          "3": 222
+        }
+      },
+      "acc_history": [
+        0.984,
+        0.984,
+        0.984,
+        0.984,
+        0.984
+      ],
+      "f1_history": [
+        0.9762,
+        0.9762,
+        0.9762,
+        0.9762,
+        0.9762
+      ],
+      "final_acc": 0.984
+    },
+    {
+      "client_id": 2,
+      "name": "Hospital 3",
+      "profile": {
+        "client_id": 2,
+        "name": "Hospital 3",
+        "n_samples": 19285,
+        "class_dist": {
+          "0": 18851,
+          "1": 133,
+          "2": 79,
+          "3": 222
+        }
+      },
+      "acc_history": [
+        0.9841,
+        0.9841,
+        0.9841,
+        0.9841,
+        0.9841
+      ],
+      "f1_history": [
+        0.9763,
+        0.9763,
+        0.9763,
+        0.9763,
+        0.9763
+      ],
+      "final_acc": 0.9841
+    }
+  ],
+  "fedprox_explanation": {
+    "algorithm": "FedProx",
+    "mu": 0.01,
+    "why_fedprox": "FedAvg simply averages client weights, which fails when hospital data distributions differ (non-IID). FedProx adds a proximal term (mu/2)||w-w_global||^2 to each client's local objective. This mathematically constrains how far the local model can drift from the global model during each round, ensuring stable convergence even with heterogeneous hospital data.",
+    "proximal_effect": "With mu=0.01, the proximal term acts as a soft constraint. A hospital with mostly elderly diabetic patients (Client 0) cannot overfit its local model to that distribution \u2014 the proximal term pulls it back toward the global model that represents all hospitals collectively.",
+    "convergence_note": "converged (delta=0.0000)"
+  },
+  "total_rounds": 5,
+  "total_clients": 3,
+  "summary": "FedProx completed 5 rounds across 3 hospital clients. Final global model accuracy: 0.9838. Convergence status: converged (delta=0.0000)."
+}

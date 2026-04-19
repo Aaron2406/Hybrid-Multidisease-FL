@@ -1,0 +1,231 @@
+{
+  "disease": "liver",
+  "config": {
+    "n_clients": 3,
+    "n_rounds": 5,
+    "mu": 0.01,
+    "algorithm": "FedProx",
+    "local_model": "Logistic Regression"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "global_acc": 0.2162,
+      "global_f1": 0.2025,
+      "client_metrics": [
+        {
+          "accuracy": 0.6847,
+          "f1": 0.6839,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 112,
+            "2": 110
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.6261,
+          "f1": 0.6258,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 117,
+            "2": 105
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.7072,
+          "f1": 0.7004,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 104,
+            "2": 118
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 1.7251
+    },
+    {
+      "round": 2,
+      "global_acc": 0.2162,
+      "global_f1": 0.2025,
+      "client_metrics": [
+        {
+          "accuracy": 0.6847,
+          "f1": 0.6839,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 112,
+            "2": 110
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.6261,
+          "f1": 0.6258,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 117,
+            "2": 105
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.7072,
+          "f1": 0.7004,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 104,
+            "2": 118
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 1.7423
+    },
+    {
+      "round": 3,
+      "global_acc": 0.2162,
+      "global_f1": 0.2025,
+      "client_metrics": [
+        {
+          "accuracy": 0.6847,
+          "f1": 0.6839,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 112,
+            "2": 110
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.6261,
+          "f1": 0.6258,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 117,
+            "2": 105
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.7072,
+          "f1": 0.7004,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 104,
+            "2": 118
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 1.7425
+    },
+    {
+      "round": 4,
+      "global_acc": 0.2162,
+      "global_f1": 0.2025,
+      "client_metrics": [
+        {
+          "accuracy": 0.6847,
+          "f1": 0.6839,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 112,
+            "2": 110
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.6261,
+          "f1": 0.6258,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 117,
+            "2": 105
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.7072,
+          "f1": 0.7004,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 104,
+            "2": 118
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 1.7425
+    },
+    {
+      "round": 5,
+      "global_acc": 0.2162,
+      "global_f1": 0.2025,
+      "client_metrics": [
+        {
+          "accuracy": 0.6847,
+          "f1": 0.6839,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 112,
+            "2": 110
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.6261,
+          "f1": 0.6258,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 117,
+            "2": 105
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.7072,
+          "f1": 0.7004,
+          "n_samples": 222,
+          "class_dist": {
+            "1": 104,
+            "2": 118
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 1.7425
+    }
+  ],
+  "client_profiles": [
+    {
+      "client_id": 0,
+      "name": "Hospital 1",
+      "n_samples": 222,
+      "class_dist": {
+        "1": 112,
+        "2": 110
+      }
+    },
+    {
+      "client_id": 1,
+      "name": "Hospital 2",
+      "n_samples": 222,
+      "class_dist": {
+        "1": 117,
+        "2": 105
+      }
+    },
+    {
+      "client_id": 2,
+      "name": "Hospital 3",
+      "n_samples": 222,
+      "class_dist": {
+        "1": 104,
+        "2": 118
+      }
+    }
+  ]
+}

@@ -19,6 +19,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 
@@ -86,18 +87,60 @@ def load_data(csv_path: str) -> pd.DataFrame:
 
 def split_features_target(df: pd.DataFrame):
     """Split into feature matrix X and target vector y."""
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.impute import SimpleImputer
+
     target = TARGET_COL if TARGET_COL in df.columns else df.columns[-1]
 
-    X = df[SELECTED_FEATURES].values.astype(np.float64)
-    y = df[target].values.astype(np.int32)
+    # ── Step 1: Copy feature columns ─────────────────────────
+    df_encoded = df[SELECTED_FEATURES].copy()
+
+    # ── Step 2: Encode ALL columns (text and numeric both) ───
+    for col in df_encoded.columns:
+        # Replace any 'yes'/'no' style values first
+        df_encoded[col] = df_encoded[col].astype(str).str.strip().str.lower()
+        df_encoded[col] = df_encoded[col].replace({
+            'yes': 1, 'no': 0,
+            'true': 1, 'false': 0,
+            'male': 1, 'female': 0,
+            'positive': 1, 'negative': 0,
+        })
+        # If still non-numeric use LabelEncoder
+        try:
+            df_encoded[col] = pd.to_numeric(df_encoded[col], errors='raise')
+        except Exception:
+            le = LabelEncoder()
+            df_encoded[col] = le.fit_transform(df_encoded[col].astype(str))
+
+    # ── Step 3: Convert to float ──────────────────────────────
+    X_raw = df_encoded.values.astype(np.float64)
+
+    # ── Step 4: Impute any remaining NaN ─────────────────────
+    if np.isnan(X_raw).any():
+        print("\n  ⚠ NaN values found — applying median imputation")
+        imputer = SimpleImputer(strategy="median")
+        X = imputer.fit_transform(X_raw)
+        print(f"  ✅ NaN values fixed")
+    else:
+        X = X_raw
+
+    # ── Step 5: Encode target if text ────────────────────────
+    y_raw = df[target].astype(str).str.strip().str.lower()
+    y_raw = y_raw.replace({'yes': 1, 'no': 0,
+                           'true': 1, 'false': 0,
+                           'positive': 1, 'negative': 0})
+    try:
+        y = pd.to_numeric(y_raw, errors='raise').values.astype(np.int32)
+    except Exception:
+        le = LabelEncoder()
+        y  = le.fit_transform(y_raw.astype(str)).astype(np.int32)
 
     print(f"\n  Feature matrix X : shape={X.shape}  dtype={X.dtype}")
     print(f"  Target vector  y : shape={y.shape}   dtype={y.dtype}")
 
     unique, counts = np.unique(y, return_counts=True)
     for cls, cnt in zip(unique, counts):
-        label = "No Diabetes" if cls == 0 else "Diabetes"
-        print(f"    Class {cls} ({label:<12}) : {cnt:,}  ({cnt/len(y)*100:.1f}%)")
+        print(f"    Class {cls} : {cnt:,}  ({cnt/len(y)*100:.1f}%)")
 
     return X, y
 
@@ -147,14 +190,34 @@ def normalize_for_quantum(X_train: np.ndarray, X_test: np.ndarray):
 
 def apply_smote(X_train: np.ndarray, y_train: np.ndarray):
     """Apply SMOTE on training data only if classes are imbalanced."""
+    from sklearn.impute import SimpleImputer
+
+    # ── Fix NaN values before SMOTE ──────────────────────────
+    if np.isnan(X_train).any():
+        print("\n  ⚠ NaN values detected — applying median imputation")
+        imputer = SimpleImputer(strategy="median")
+        X_train = imputer.fit_transform(X_train)
+        print(f"  ✅ NaN values fixed")
+
     unique, counts = np.unique(y_train, return_counts=True)
     print(f"\n  Class balance before SMOTE:")
     for cls, cnt in zip(unique, counts):
         print(f"    Class {int(cls)} : {int(cnt)}")
 
-    ratio = max(counts) / min(counts)
+    # ── Check minimum samples per class ──────────────────────
+    min_samples = min(counts)
+    ratio       = max(counts) / min_samples
+
+    if min_samples < 6:
+        print(f"\n  ⚠ Not enough samples for SMOTE "
+              f"(min class has {min_samples} samples, need 6)")
+        print(f"  SMOTE skipped — returning original data")
+        return X_train, y_train
+
     if ratio > 1.5:
-        smote              = SMOTE(random_state=RANDOM_STATE)
+        # Set k_neighbors safely
+        k = min(5, min_samples - 1)
+        smote              = SMOTE(random_state=RANDOM_STATE, k_neighbors=k)
         X_res, y_res       = smote.fit_resample(X_train, y_train)
         u2, c2             = np.unique(y_res, return_counts=True)
         print(f"  Class balance after SMOTE:")
@@ -164,7 +227,6 @@ def apply_smote(X_train: np.ndarray, y_train: np.ndarray):
     else:
         print(f"  Classes already balanced (ratio={ratio:.2f}) - SMOTE skipped.")
         return X_train, y_train
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MAIN PIPELINE

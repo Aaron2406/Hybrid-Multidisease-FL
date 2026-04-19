@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────────
+#  Module 3 — Federated Learning with FedProx
+#  Install with: pip install -r requirements_module3.txt
+# ─────────────────────────────────────────────────────────────
+
+# ML classifiers (baseline + local FL models)
+scikit-learn==1.4.2
+
+# SHAP for explainability
+shap==0.45.0
+
+# Numerical operations
+numpy==1.26.4
+
+# Data handling
+pandas==2.2.2
+
+# Model persistence
+joblib==1.4.2
+
+# Plotting (convergence charts saved as JSON, not images)
+matplotlib==3.9.0

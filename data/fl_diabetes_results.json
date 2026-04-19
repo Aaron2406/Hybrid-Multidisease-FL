@@ -1,0 +1,231 @@
+{
+  "disease": "diabetes",
+  "config": {
+    "n_clients": 3,
+    "n_rounds": 5,
+    "mu": 0.01,
+    "algorithm": "FedProx",
+    "local_model": "Logistic Regression"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "global_acc": 0.6771,
+      "global_f1": 0.6767,
+      "client_metrics": [
+        {
+          "accuracy": 0.7537,
+          "f1": 0.7246,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 5655,
+            "1": 12724
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.679,
+          "f1": 0.6788,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 9896,
+            "1": 8483
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.6597,
+          "f1": 0.6433,
+          "n_samples": 19795,
+          "class_dist": {
+            "0": 12725,
+            "1": 7070
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 0.8288
+    },
+    {
+      "round": 2,
+      "global_acc": 0.6771,
+      "global_f1": 0.6767,
+      "client_metrics": [
+        {
+          "accuracy": 0.7537,
+          "f1": 0.7246,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 5655,
+            "1": 12724
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.679,
+          "f1": 0.6788,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 9896,
+            "1": 8483
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.6597,
+          "f1": 0.6433,
+          "n_samples": 19795,
+          "class_dist": {
+            "0": 12725,
+            "1": 7070
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 0.8371
+    },
+    {
+      "round": 3,
+      "global_acc": 0.6771,
+      "global_f1": 0.6767,
+      "client_metrics": [
+        {
+          "accuracy": 0.7537,
+          "f1": 0.7246,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 5655,
+            "1": 12724
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.679,
+          "f1": 0.6788,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 9896,
+            "1": 8483
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.6597,
+          "f1": 0.6433,
+          "n_samples": 19795,
+          "class_dist": {
+            "0": 12725,
+            "1": 7070
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 0.8371
+    },
+    {
+      "round": 4,
+      "global_acc": 0.6771,
+      "global_f1": 0.6767,
+      "client_metrics": [
+        {
+          "accuracy": 0.7537,
+          "f1": 0.7246,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 5655,
+            "1": 12724
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.679,
+          "f1": 0.6788,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 9896,
+            "1": 8483
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.6597,
+          "f1": 0.6433,
+          "n_samples": 19795,
+          "class_dist": {
+            "0": 12725,
+            "1": 7070
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 0.8371
+    },
+    {
+      "round": 5,
+      "global_acc": 0.6771,
+      "global_f1": 0.6767,
+      "client_metrics": [
+        {
+          "accuracy": 0.7537,
+          "f1": 0.7246,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 5655,
+            "1": 12724
+          },
+          "client_id": 0
+        },
+        {
+          "accuracy": 0.679,
+          "f1": 0.6788,
+          "n_samples": 18379,
+          "class_dist": {
+            "0": 9896,
+            "1": 8483
+          },
+          "client_id": 1
+        },
+        {
+          "accuracy": 0.6597,
+          "f1": 0.6433,
+          "n_samples": 19795,
+          "class_dist": {
+            "0": 12725,
+            "1": 7070
+          },
+          "client_id": 2
+        }
+      ],
+      "weight_norm": 0.8371
+    }
+  ],
+  "client_profiles": [
+    {
+      "client_id": 0,
+      "name": "Hospital 1",
+      "n_samples": 18379,
+      "class_dist": {
+        "0": 5655,
+        "1": 12724
+      }
+    },
+    {
+      "client_id": 1,
+      "name": "Hospital 2",
+      "n_samples": 18379,
+      "class_dist": {
+        "0": 9896,
+        "1": 8483
+      }
+    },
+    {
+      "client_id": 2,
+      "name": "Hospital 3",
+      "n_samples": 19795,
+      "class_dist": {
+        "0": 12725,
+        "1": 7070
+      }
+    }
+  ]
+}

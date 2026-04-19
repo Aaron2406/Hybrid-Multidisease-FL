@@ -1,45 +1,109 @@
-"""
-backend.py  (updated - Module 1 + Module 2)
----------------------------------------------------------------------
-Endpoints:
-  GET  /status        health check
-  POST /run-model     Module 1 - XGBoost feature selection
-  POST /run-quantum   Module 2 - Quantum feature encoding
-"""
+# backend.py - Multi-Disease Integration (Module 1 + 2 + 3)
+# Project root: C:/Users/DELL/Hybrid-Multidisease-FL
+# Data folder:  C:/Users/DELL/Hybrid-Multidisease-FL/data
+#
+# Endpoints:
+#   GET  /status
+#   GET  /pipeline-status
+#   POST /upload-disease/<disease>
+#   POST /run-model/<disease>
+#   POST /run-quantum/<disease>
+#   POST /run-m3-stream/<disease>
+#   GET  /metabolic-report
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
-import tempfile
-import os
-import sys
+import tempfile, os, sys, json, queue, threading
 
 from xgboost3 import run_pipeline
 
-# Add module2_quantum folder to Python path
-MODULE2_PATH = os.path.normpath(
-    os.path.join(
-        r"C:\Users\DELL\OneDrive\Desktop\Hybrid-Multidisease-FL\Hybrid-Multidisease-FL",
-        "module2_quantum"
-    )
-)
-if os.path.exists(MODULE2_PATH) and MODULE2_PATH not in sys.path:
-    sys.path.insert(0, MODULE2_PATH)
+# ── Fixed paths ───────────────────────────────────────────────────────────────
+PROJECT_ROOT = r"C:\Users\DELL\Hybrid-Multidisease-FL"
+DATA_FOLDER  = os.path.join(PROJECT_ROOT, "data")
+MODULE2_PATH = os.path.join(PROJECT_ROOT, "module2_quantum")
+MODULE3_PATH = os.path.join(PROJECT_ROOT, "module3_fl")
+
+os.makedirs(DATA_FOLDER, exist_ok=True)
+
+for p in [MODULE2_PATH, MODULE3_PATH]:
+    if p and os.path.exists(p) and p not in sys.path:
+        sys.path.insert(0, p)
+
+# ── Disease configuration ─────────────────────────────────────────────────────
+# Each disease has:
+#   target_col : the column name used as label in that dataset
+#   display    : human readable name shown in frontend
+#   color      : color used in frontend UI
+DISEASES = {
+    "diabetes": {
+        "target_col": "Diabetes",
+        "display":    "Diabetes",
+        "color":      "#2563eb",
+        "icon":       "🩺",
+    },
+    "kidney": {
+        "target_col": "classification",
+        "display":    "Kidney Disease",
+        "color":      "#7c3aed",
+        "icon":       "🫘",
+    },
+    "heart": {
+        "target_col": "condition",
+        "display":    "Heart Disease",
+        "color":      "#dc2626",
+        "icon":       "❤️",
+    },
+    "liver": {
+        "target_col": "is_patient",
+        "display":    "Liver Disease",
+        "color":      "#059669",
+        "icon":       "🫀",
+    },
+}
+
+print(f"\n  Backend starting — Multi-Disease Mode")
+print(f"  Data folder : {DATA_FOLDER}")
+print(f"  Module 2    : {MODULE2_PATH}")
+print(f"  Module 3    : {MODULE3_PATH}")
+print(f"  Diseases    : {list(DISEASES.keys())}")
 
 app = Flask(__name__)
 CORS(app)
 
-# Shared state - stores the 8-feature CSV path after /run-model runs
-_quantum_csv_path = None
 
+# ── Path helpers ──────────────────────────────────────────────────────────────
+
+def _m1_path(disease):
+    return os.path.join(DATA_FOLDER, f"{disease}_8features.csv")
+
+def _q_train_path(disease):
+    return os.path.join(DATA_FOLDER, f"quantum_{disease}_train.csv")
+
+def _q_test_path(disease):
+    return os.path.join(DATA_FOLDER, f"quantum_{disease}_test.csv")
+
+def _model_path(disease):
+    return os.path.join(DATA_FOLDER, f"global_{disease}_model.pkl")
+
+def _m1_ready(disease):
+    return os.path.exists(_m1_path(disease))
+
+def _m2_ready(disease):
+    return os.path.exists(_q_train_path(disease)) and \
+           os.path.exists(_q_test_path(disease))
+
+def _m3_ready(disease):
+    return os.path.exists(_model_path(disease))
+
+
+# ── Upload / cleanup helpers ──────────────────────────────────────────────────
 
 def _save_upload(file):
     suffix = os.path.splitext(file.filename)[1] or ".csv"
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-    tmp_path = tmp.name
-    file.save(tmp_path)
+    file.save(tmp.name)
     tmp.close()
-    return tmp_path
-
+    return tmp.name
 
 def _cleanup(path):
     try:
@@ -48,129 +112,184 @@ def _cleanup(path):
     except OSError:
         pass
 
+def _validate_disease(disease):
+    if disease not in DISEASES:
+        return jsonify({
+            "error": f"Unknown disease '{disease}'. "
+                     f"Valid options: {list(DISEASES.keys())}"
+        }), 400
+    return None
+
 
 # ── GET /status ───────────────────────────────────────────────────────────────
 
 @app.route("/status", methods=["GET"])
 def status():
     return jsonify({
-        "status":            "running",
-        "module1":           "ready",
-        "module2":           "ready" if os.path.exists(MODULE2_PATH) else "path not found",
-        "module2_path":      MODULE2_PATH,
-        "quantum_csv_ready": bool(_quantum_csv_path and os.path.exists(_quantum_csv_path)),
-        "endpoints":         ["/status", "/run-model", "/run-quantum"],
+        "status":      "running",
+        "mode":        "multi-disease",
+        "data_folder": DATA_FOLDER,
+        "diseases":    list(DISEASES.keys()),
+        "endpoints": [
+            "GET  /status",
+            "GET  /pipeline-status",
+            "POST /upload-disease/<disease>",
+            "POST /run-model/<disease>",
+            "POST /run-quantum/<disease>",
+            "POST /run-m3-stream/<disease>",
+            "GET  /metabolic-report",
+        ],
     })
 
 
-# ── POST /run-model  (Module 1) ───────────────────────────────────────────────
+# ── GET /pipeline-status ──────────────────────────────────────────────────────
 
-@app.route("/run-model", methods=["POST"])
-def run_model():
+@app.route("/pipeline-status", methods=["GET"])
+def pipeline_status():
     """
-    Module 1 - XGBoost feature selection pipeline.
-    Unchanged behaviour + exports 8features CSV for Module 2.
+    Returns which pipeline stages are complete for each disease.
+    Frontend uses this to show progress indicators.
     """
-    global _quantum_csv_path
+    status_map = {}
+    for disease, cfg in DISEASES.items():
+        status_map[disease] = {
+            "display":  cfg["display"],
+            "color":    cfg["color"],
+            "icon":     cfg["icon"],
+            "module1":  _m1_ready(disease),
+            "module2":  _m2_ready(disease),
+            "module3":  _m3_ready(disease),
+            "complete": _m3_ready(disease),
+        }
+    all_complete = all(v["complete"] for v in status_map.values())
+    return jsonify({
+        "diseases":     status_map,
+        "all_complete": all_complete,
+    })
+
+
+# ── POST /upload-disease/<disease> ────────────────────────────────────────────
+
+@app.route("/upload-disease/<disease>", methods=["POST"])
+def upload_disease(disease):
+    """
+    Upload a CSV for a specific disease.
+    Saves it directly to data folder as {disease}_raw.csv
+    so it can be used by run-model later.
+    """
+    err = _validate_disease(disease)
+    if err:
+        return err
 
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
     file = request.files["file"]
-    if file.filename == "":
+    if not file.filename:
         return jsonify({"error": "Empty filename"}), 400
 
-    tmp_path = None
+    # Save raw uploaded file to data folder
+    raw_path = os.path.join(DATA_FOLDER, f"{disease}_raw.csv")
+    file.save(raw_path)
+
+    return jsonify({
+        "status":   "uploaded",
+        "disease":  disease,
+        "display":  DISEASES[disease]["display"],
+        "path":     raw_path,
+        "message":  f"{DISEASES[disease]['display']} dataset uploaded successfully.",
+    })
+
+
+# ── POST /run-model/<disease>  (Module 1) ─────────────────────────────────────
+
+@app.route("/run-model/<disease>", methods=["POST"])
+def run_model(disease):
+    """
+    Module 1 - XGBoost feature selection for a specific disease.
+    Reads uploaded CSV, runs pipeline, saves {disease}_8features.csv
+    """
+    err = _validate_disease(disease)
+    if err:
+        return err
+
+    # Get CSV — either uploaded now or previously saved
+    tmp = None
+    if "file" in request.files and request.files["file"].filename:
+        tmp      = _save_upload(request.files["file"])
+        csv_path = tmp
+    else:
+        csv_path = os.path.join(DATA_FOLDER, f"{disease}_raw.csv")
+        if not os.path.exists(csv_path):
+            return jsonify({
+                "error": f"No CSV found for {disease}. "
+                         f"Upload via /upload-disease/{disease} first."
+            }), 400
+
     try:
-        tmp_path = _save_upload(file)
-        results  = run_pipeline(tmp_path)
-
-        # Export 8-feature CSV so /run-quantum can use it automatically
-        if os.path.exists(MODULE2_PATH):
-            import pandas as pd
-            selected = [f["feature"] for f in results.get("top_features", [])]
-            target   = "Diabetes"
-            df       = pd.read_csv(tmp_path)
-            cols     = [c for c in selected if c in df.columns]
-            if cols and target in df.columns:
-                out = os.path.join(MODULE2_PATH, "diabetes_8features.csv")
-                df[cols + [target]].to_csv(out, index=False)
-                _quantum_csv_path        = out
-                results["quantum_ready"] = True
-            else:
-                results["quantum_ready"] = False
-        else:
-            results["quantum_ready"] = False
-
+        results = run_pipeline(csv_path, disease=disease)
+        results["disease"]        = disease
+        results["display"]        = DISEASES[disease]["display"]
+        results["quantum_ready"]  = _m1_ready(disease)
+        results["m1_output_path"] = _m1_path(disease)
     except Exception as e:
         import traceback
-        return jsonify({"error": str(e), "trace": traceback.format_exc()}), 500
+        return jsonify({
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }), 500
     finally:
-        _cleanup(tmp_path)
+        _cleanup(tmp)
 
     return jsonify(results)
 
 
-# ── POST /run-quantum  (Module 2) ─────────────────────────────────────────────
+# ── POST /run-quantum/<disease>  (Module 2) ───────────────────────────────────
 
-@app.route("/run-quantum", methods=["POST"])
-def run_quantum():
+@app.route("/run-quantum/<disease>", methods=["POST"])
+def run_quantum(disease):
     """
-    Module 2 - Quantum feature encoding.
-
-    Call after /run-model (no file needed - uses saved CSV automatically).
-    Or upload a fresh CSV directly.
-
-    Returns:
-      circuit_info       - qubits, layers, gates, feature mapping
-      quantum_features   - sample encoded vectors
-      spread             - value distribution across [-1, +1]
-      simulation         - layer-by-layer trace for reviewer/guide
-      output_files       - list of files saved
-      pipeline_status    - M1 + M2 status
+    Module 2 - Quantum encoding for a specific disease.
+    Reads {disease}_8features.csv from data folder.
+    Saves quantum_{disease}_train/test.csv to data folder.
     """
-    global _quantum_csv_path
+    err = _validate_disease(disease)
+    if err:
+        return err
 
-    tmp_path = None
-    csv_path = None
-
+    tmp = None
     try:
-        # Decide which CSV to use
-        if "file" in request.files and request.files["file"].filename != "":
-            tmp_path = _save_upload(request.files["file"])
-            csv_path = tmp_path
-        elif _quantum_csv_path and os.path.exists(_quantum_csv_path):
-            csv_path = _quantum_csv_path
-        else:
-            sample = os.path.join(MODULE2_PATH, "diabetes_8features_sample.csv")
-            if os.path.exists(sample):
-                csv_path = sample
-            else:
-                return jsonify({
-                    "error": "No CSV available. Call /run-model first or upload a file."
-                }), 400
+        # Use disease-specific CSV from Module 1
+        csv_path = _m1_path(disease)
+        if not os.path.exists(csv_path):
+            return jsonify({
+                "error": f"{disease}_8features.csv not found. "
+                         f"Run /run-model/{disease} first."
+            }), 400
 
-        # Import Module 2
         try:
             from feature_extractor import run_feature_extraction
             from quantum_simulator import run_simulation
         except ImportError as ie:
             return jsonify({
-                "error": f"Module 2 import failed: {str(ie)}. "
-                         f"Check module2_quantum/ exists at: {MODULE2_PATH}"
+                "error": f"Module 2 import failed: {str(ie)}"
             }), 500
 
-        # Run Module 2
-        df_train, df_test, weights = run_feature_extraction(csv_path)
-        simulation                 = run_simulation(csv_path, weights)
+        # Run Module 2 with disease-specific output paths
+        df_train, df_test, weights = run_feature_extraction(
+            csv_path, disease=disease
+        )
+        simulation = run_simulation(csv_path, weights)
 
-        # Build response
         q_cols     = [c for c in df_train.columns if c.startswith("Q_feature")]
         vectors    = df_train[q_cols].head(5).round(4).values.tolist()
-        labels     = df_train["Diabetes"].head(5).tolist()
+        label_col  = df_train.columns[-1]
+        labels     = df_train[label_col].head(5).tolist()
         train_vals = df_train[q_cols].values
         test_vals  = df_test[q_cols].values
 
-        results = {
+        return jsonify({
+            "disease":  disease,
+            "display":  DISEASES[disease]["display"],
             "quantum_features_sample": [
                 {"label": int(labels[i]), "vector": vectors[i]}
                 for i in range(len(vectors))
@@ -182,52 +301,189 @@ def run_quantum():
                 "test":  round(float(test_vals.max()  - test_vals.min()),  4),
             },
             "circuit_info": {
-                "n_qubits":     8,
+                "n_qubits":     len(q_cols),
                 "n_layers":     3,
                 "entanglement": "linear chain",
                 "encoding":     "angle encoding (RY gates)",
                 "measurement":  "PauliZ expectation value",
-                "total_params": 48,
+                "total_params": len(q_cols) * 3 * 2,
                 "weight_range": "[-pi/4, +pi/4]",
                 "gates_used":   ["Hadamard", "RY", "CNOT", "RZ", "PauliZ"],
-                "feature_map": {
-                    "qubit_0": "HighBP",
-                    "qubit_1": "GenHlth",
-                    "qubit_2": "HighChol",
-                    "qubit_3": "BMI",
-                    "qubit_4": "DifficultyWalk",
-                    "qubit_5": "Age",
-                    "qubit_6": "PhysHlth",
-                    "qubit_7": "HeartDiseaseorAttack",
+                "feature_map":  {
+                    f"qubit_{i}": q_cols[i]
+                    for i in range(len(q_cols))
                 },
             },
-            "simulation": simulation,
-            "output_files": [
-                "module2_quantum/quantum_train_features.csv",
-                "module2_quantum/quantum_test_features.csv",
-                "module2_quantum/quantum_weights.npy",
-                "module2_quantum/simulation_report.txt",
-                "module2_quantum/bloch_states.json",
-            ],
+            "simulation":      simulation,
             "pipeline_status": {
                 "module1": "complete",
                 "module2": "complete",
-                "csv_used": os.path.basename(csv_path),
             },
-        }
+            "m3_ready": _m2_ready(disease),
+        })
 
     except Exception as e:
         import traceback
-        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+        return jsonify({
+            "error":     str(e),
+            "traceback": traceback.format_exc()
+        }), 500
     finally:
-        _cleanup(tmp_path)
+        _cleanup(tmp)
 
-    return jsonify(results)
 
+# ── POST /run-m3-stream/<disease>  (Module 3 SSE) ────────────────────────────
+
+@app.route("/run-m3-unified", methods=["POST"])
+def run_m3_unified():
+    if not os.path.exists(MODULE3_PATH):
+        return jsonify({"error": f"module3_fl not found at: {MODULE3_PATH}"}), 500
+
+    log_queue = queue.Queue()
+
+    try:
+        from stream_m3 import run_module3_streaming
+    except ImportError as ie:
+        return jsonify({"error": f"stream_m3 import failed: {str(ie)}"}), 500
+
+    threading.Thread(
+        target=run_module3_streaming,
+        args=(log_queue, "unified"),
+        daemon=True
+    ).start()
+
+    def generate():
+        while True:
+            try:
+                ev = log_queue.get(timeout=300)
+            except queue.Empty:
+                yield "event: ping\ndata: {}\n\n"
+                continue
+            yield f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
+            if ev.get("type") in ("done", "error"):
+                break
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control":     "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection":        "keep-alive",
+        }
+    )
+
+# ── GET /metabolic-report ─────────────────────────────────────────────────────
+
+@app.route("/metabolic-report", methods=["GET"])
+def metabolic_report():
+    """
+    Final combined metabolic syndrome risk report.
+    Reads results from all disease models and combines into
+    a single Metabolic Syndrome Risk Profile.
+    Only available after all 4 diseases complete Module 3.
+    """
+    report = {}
+    all_ready = True
+
+    for disease, cfg in DISEASES.items():
+        model_path = _model_path(disease)
+        if not os.path.exists(model_path):
+            all_ready = False
+            report[disease] = {
+                "display":  cfg["display"],
+                "color":    cfg["color"],
+                "icon":     cfg["icon"],
+                "status":   "not_ready",
+                "message":  f"Run Module 3 for {cfg['display']} first.",
+            }
+            continue
+
+        try:
+            import joblib
+            import numpy as np
+            import pandas as pd
+
+            model     = joblib.load(model_path)
+            test_path = _q_test_path(disease)
+            df_test   = pd.read_csv(test_path)
+            q_cols    = [c for c in df_test.columns if c.startswith("Q_feature")]
+            label_col = df_test.columns[-1]
+
+            X_test = df_test[q_cols].values
+            y_test = df_test[label_col].values
+
+            # Get prediction probability for patient #1
+            sample     = X_test[0:1]
+            prob       = float(model.predict_proba(sample)[0][1])
+            risk_level = "High" if prob > 0.65 else \
+                         "Medium" if prob > 0.35 else "Low"
+
+            report[disease] = {
+                "display":    cfg["display"],
+                "color":      cfg["color"],
+                "icon":       cfg["icon"],
+                "status":     "complete",
+                "risk_level": risk_level,
+                "probability": round(prob * 100, 1),
+            }
+
+        except Exception as e:
+            all_ready = False
+            report[disease] = {
+                "display": cfg["display"],
+                "color":   cfg["color"],
+                "icon":    cfg["icon"],
+                "status":  "error",
+                "message": str(e),
+            }
+
+    # Overall metabolic syndrome risk
+    # High if 2 or more diseases are high risk
+    if all_ready:
+        high_count = sum(
+            1 for d in report.values()
+            if d.get("risk_level") == "High"
+        )
+        medium_count = sum(
+            1 for d in report.values()
+            if d.get("risk_level") == "Medium"
+        )
+        overall = "High"   if high_count >= 2 else \
+                  "Medium" if high_count == 1 or medium_count >= 2 else \
+                  "Low"
+
+        # Average probability across all diseases
+        avg_prob = round(
+            sum(d.get("probability", 0) for d in report.values()) / len(report),
+            1
+        )
+    else:
+        overall  = "Incomplete"
+        avg_prob = 0
+
+    return jsonify({
+        "diseases":         report,
+        "all_complete":     all_ready,
+        "overall_risk":     overall,
+        "average_risk_pct": avg_prob,
+        "summary": (
+            f"Metabolic Syndrome Risk: {overall}. "
+            f"Average disease risk: {avg_prob}%."
+        ),
+    })
+
+
+# ── Startup ───────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("\n  Flask server starting ...")
-    print(f"  Module 2 path : {MODULE2_PATH}")
-    print(f"  Endpoints     : /status  /run-model  /run-quantum")
-    print(f"  URL           : http://localhost:5000\n")
+    print(f"\n  Multi-Disease Endpoints:")
+    print(f"    GET  http://localhost:5000/status")
+    print(f"    GET  http://localhost:5000/pipeline-status")
+    print(f"    POST http://localhost:5000/upload-disease/<disease>")
+    print(f"    POST http://localhost:5000/run-model/<disease>")
+    print(f"    POST http://localhost:5000/run-quantum/<disease>")
+    print(f"    POST http://localhost:5000/run-m3-stream/<disease>")
+    print(f"    GET  http://localhost:5000/metabolic-report")
+    print(f"\n  Valid diseases: {list(DISEASES.keys())}\n")
     app.run(debug=True, port=5000)
